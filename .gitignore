@@ -1,0 +1,23 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# Python (serve.py)
+__pycache__/
+*.pyc
+
+# Node, if a build step is added later
+node_modules/
+dist/
+
+# Local tooling
+.claude/
+
+# Large portfolio media (the demo video): keep it out of git history.
+# Upload it to the README on GitHub or attach it to a release instead.
+portfolio/

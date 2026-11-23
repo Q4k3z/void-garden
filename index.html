@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="theme-color" content="#050a12" />
+<title>VOID GARDEN</title>
+<meta name="description" content="A bioluminescent alien world grown from a single seed: procedural terrain, flora, creatures, sky and sound, generated in your browser with WebGL 2." />
+<meta property="og:title" content="VOID GARDEN" />
+<meta property="og:description" content="A procedural alien ecosystem that runs in your browser. Zero asset files." />
+<meta property="og:type" content="website" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050a12'/%3E%3Ctext x='32' y='45' font-size='38' text-anchor='middle' fill='%237dffe4'%3E%E2%9C%B3%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="src/ui/style.css" />
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="vignette"></div>
+
+<!-- Loading ---------------------------------------------------------------->
+<div id="loading">
+  <div class="load-inner">
+    <div class="mark big">✳</div>
+    <div class="load-title">VOID GARDEN</div>
+    <div class="load-sub">GENERATING SECTOR <b id="load-seed">—</b></div>
+    <div class="bar"><i id="load-bar"></i></div>
+    <div id="load-step">Initialising</div>
+  </div>
+</div>
+
+<!-- HUD -------------------------------------------------------------------->
+<div id="hud" class="faded">
+  <div class="top"><div class="mark">✳</div><div><div class="brand">VOID GARDEN</div><div class="subbrand">FIELD STUDY // 07-A</div></div></div>
+  <div id="compass"><div id="compass-strip"></div><i class="compass-tick"></i></div>
+  <div class="coords">SECTOR <b id="sector">LYRA-09</b><span id="region-small">—</span></div>
+  <div id="reticle"></div>
+  <div id="prompt"><span class="key">E</span><span id="prompt-verb">AWAKEN</span><span id="prompt-name">LUMEN BLOOM</span></div>
+  <div id="region-title"><div class="rt-eyebrow" id="rt-eyebrow">ENTERING</div><div class="rt-name" id="rt-name"></div><div class="rt-rule"></div></div>
+  <div id="hint">LOOK FOR THE GLOWING SEED <span>✧</span></div>
+  <div class="bottomleft"><span>BIOME : <b id="biome">LUMEN THICKET</b></span><span>ALTITUDE : <b id="altitude">0 M</b></span><span>ATMOSPHERE : <b id="atmo">BREATHABLE</b></span></div>
+  <div class="bottomright"><div class="br-row"><i class="dot"></i><span id="status">ECOSYSTEM ACTIVE</span></div><div class="br-row dim"><span id="records">RECORDS 0 / 0</span></div></div>
+</div>
+<div id="toast"><div class="toast-eyebrow" id="toast-eyebrow">DISCOVERED</div><div id="toast-text">THE GARDEN REMEMBERS YOUR TOUCH</div></div>
+<div id="echo"><div class="echo-eyebrow">ECHO</div><div id="echo-text"></div></div>
+<div id="crossfade"></div>
+
+<!-- Intro ------------------------------------------------------------------>
+<div id="intro" class="hidden">
+ <div class="card">
+  <div class="eyebrow">AN INTERACTIVE PROCEDURAL EXPERIENCE</div>
+  <h1 class="title">VOID <em>GARDEN</em></h1>
+  <p class="desc">A quiet world at the edge of known space. Wander through a living alien sanctuary, follow the bioluminescence, and wake the things that sleep beneath the roots.</p>
+  <div class="rule"></div>
+  <div class="controls">
+    <div><b>W A S D</b> Move</div><div><b>MOUSE</b> Look around</div>
+    <div><b>SHIFT</b> Sprint</div><div><b>SPACE</b> Jump / swim up</div>
+    <div><b>C</b> Crouch · sneak · dive</div><div><b>E</b> Interact · resonate</div>
+    <div><b>J</b> Field journal</div><div><b>ESC</b> Pause</div>
+  </div>
+  <div class="intro-opts">
+    <label>QUALITY <select id="intro-quality"><option value="auto">Auto</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="ultra">Ultra</option></select></label>
+    <label>SEED <input id="intro-seed" maxlength="24" spellcheck="false" /></label>
+  </div>
+  <button id="enter" class="btn">ENTER THE GARDEN</button>
+  <div class="note">BEST EXPERIENCED WITH HEADPHONES · DESKTOP</div>
+ </div>
+</div>
+
+<!-- Pause ------------------------------------------------------------------>
+<div id="pause" class="panel-wrap hidden">
+  <div class="card pause-card">
+    <div class="eyebrow">FIELD STUDY PAUSED</div>
+    <div class="pause-title">VOID <em>GARDEN</em></div>
+    <div class="menu">
+      <button class="btn" data-act="resume">RESUME</button>
+      <button class="btn ghost" data-act="journal">FIELD JOURNAL</button>
+      <button class="btn ghost" data-act="settings">SETTINGS</button>
+      <button class="btn ghost" data-act="origin">RETURN TO LANDING SITE</button>
+    </div>
+    <div class="controls small">
+      <div><b>W A S D</b> Move</div><div><b>SHIFT</b> Sprint</div>
+      <div><b>SPACE</b> Jump / swim up</div><div><b>C</b> Crouch · dive</div>
+      <div><b>E</b> Interact · resonate</div><div><b>J</b> Journal</div>
+      <div><b>F3</b> Performance</div><div><b>R</b> Landing site</div>
+    </div>
+  </div>
+</div>
+
+<!-- Journal ---------------------------------------------------------------->
+<div id="journal" class="panel-wrap hidden">
+  <div class="card wide">
+    <div class="panel-head"><div><div class="eyebrow">FIELD JOURNAL</div><div class="panel-title" id="journal-count">0 / 0 RECORDED</div></div><button class="btn ghost small-btn" data-close>CLOSE</button></div>
+    <div class="journal-tabs" id="journal-tabs"></div>
+    <div class="journal-list" id="journal-list"></div>
+  </div>
+</div>
+
+<!-- Settings --------------------------------------------------------------->
+<div id="settings" class="panel-wrap hidden">
+  <div class="card wide">
+    <div class="panel-head"><div><div class="eyebrow">SETTINGS</div><div class="panel-title">CALIBRATION</div></div><button class="btn ghost small-btn" data-close>CLOSE</button></div>
+    <div class="settings-grid">
+      <label>Quality preset<select id="set-quality"><option value="auto">Auto</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="ultra">Ultra</option></select><small>Density changes reload the sector</small></label>
+      <label>Render scale <output id="out-scale"></output><input type="range" id="set-scale" min="0.5" max="2" step="0.05" /></label>
+      <label class="check"><input type="checkbox" id="set-adaptive" /> Adaptive resolution (holds ~60 FPS)</label>
+      <label class="check"><input type="checkbox" id="set-shadows" /> Shadows</label>
+      <label class="check"><input type="checkbox" id="set-bloom" /> Bloom</label>
+      <label class="check"><input type="checkbox" id="set-rays" /> Light shafts</label>
+      <label>Field of view <output id="out-fov"></output><input type="range" id="set-fov" min="60" max="95" step="1" /></label>
+      <label>Mouse sensitivity <output id="out-sens"></output><input type="range" id="set-sens" min="0.3" max="2.5" step="0.05" /></label>
+      <label class="check"><input type="checkbox" id="set-invert" /> Invert Y</label>
+      <label>Volume <output id="out-vol"></output><input type="range" id="set-vol" min="0" max="1" step="0.01" /></label>
+      <label>World seed<span class="seed-row"><input id="set-seed" maxlength="24" spellcheck="false" /><button class="btn small-btn" id="set-reseed">REGENERATE</button></span></label>
+    </div>
+  </div>
+</div>
+
+<div id="perf" class="hidden"></div>
+<div id="fatal" class="hidden"></div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
